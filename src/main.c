@@ -136,6 +136,8 @@ void draw_text(RenderContext *_render_context, int _x, int _y, int _z, const cha
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 
+#include "test.h"
+
 int main(int argc, const char **argv)
 {
 	// Initialize the GPU and load the default font texture provided by
@@ -172,7 +174,13 @@ int main(int argc, const char **argv)
 
 		// Draw some text in front of the square (Z = 0, primitives with higher
 		// Z indices are drawn first).
-		draw_text(&render_context, 8, 16, 0, "Hello world!");
+		const char* thing = testfunc();
+		draw_text(&render_context, 8, 16, 0, thing );
+		draw_text(&render_context, 8, 32, 0, "I was crazy once");
+		draw_text(&render_context, 8, 48, 0, "They put me in a room");
+		draw_text(&render_context, 8, 64, 0, "A rubber room");
+		draw_text(&render_context, 8, 80, 0, "A rubber room with rats");
+		draw_text(&render_context, 8, 96, 0, "The rats made me crazy");
 
 		swapBuffers(&render_context);
 	}

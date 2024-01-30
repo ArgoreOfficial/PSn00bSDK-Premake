@@ -7,3 +7,5 @@ build
 *.vcxproj.user
 templates/psx/.vscode
 cmakebuild
+*.props
+*.targets
