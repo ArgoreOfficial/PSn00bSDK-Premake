@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <PropertyPageSchema
+      Include="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml" />
+    <AvailableItemName Include="psx_compile">
+      <Targets>_psx_compile</Targets>
+    </AvailableItemName>
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <psx_compile>
+      <Outputs>$(IntDir)%(Filename).obj</Outputs>
+    </psx_compile>
+  </ItemDefinitionGroup>
+  <PropertyGroup>
+    <ComputeCompileInputsTargets>
+      $(ComputeCompileInputsTargets);
+      Computepsx_compileOutput;
+    </ComputeCompileInputsTargets>
+    <ComputeLinkInputsTargets>
+      $(ComputeLinkInputsTargets);
+      Computepsx_compileOutput;
+    </ComputeLinkInputsTargets>
+    <ComputeLibInputsTargets>
+      $(ComputeLibInputsTargets);
+      Computepsx_compileOutput;
+    </ComputeLibInputsTargets>
+  </PropertyGroup>
+  <UsingTask
+    TaskName="psx_compile"
+    TaskFactory="XamlTaskFactory"
+    AssemblyName="Microsoft.Build.Tasks.v4.0">
+    <Task>$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml</Task>
+  </UsingTask>
+  <Target
+    Name="_psx_compile"
+    BeforeTargets="$(psx_compileBeforeTargets)"
+    AfterTargets="$(psx_compileAfterTargets)"
+    Condition="'@(psx_compile)' != ''"
+    Outputs="%(psx_compile.Outputs)"
+    Inputs="%(psx_compile.Identity);%(psx_compile.AdditionalDependencies);$(MSBuildProjectFile)"
+    DependsOnTargets="$(psx_compileDependsOn);Computepsx_compileOutput">
+    <ItemGroup Condition="'@(SelectedFiles)' != ''">
+      <psx_compile Remove="@(psx_compile)" Condition="'%(Identity)' != '@(SelectedFiles)'" />
+    </ItemGroup>
+    <ItemGroup>
+      <psx_compile_tlog
+        Include="%(psx_compile.Outputs)"
+        Condition="'%(psx_compile.Outputs)' != '' and '%(psx_compile.ExcludedFromBuild)' != 'true'">
+        <Source>@(psx_compile, '|')</Source>
+        <Inputs>@(psx_compile, ';')</Inputs>
+      </psx_compile_tlog>
+    </ItemGroup>
+    <Message
+      Importance="High"
+      Text="%(psx_compile.ExecutionDescription)" />
+    <WriteLinesToFile
+      Condition="'@(psx_compile_tlog)' != '' and '%(psx_compile_tlog.ExcludedFromBuild)' != 'true'"
+      File="$(TLogLocation)psx_compile.write.1.tlog"
+      Lines="^%(psx_compile_tlog.Source);%(psx_compile_tlog.Fullpath)" />
+    <WriteLinesToFile
+      Condition="'@(psx_compile_tlog)' != '' and '%(psx_compile_tlog.ExcludedFromBuild)' != 'true'"
+      File="$(TLogLocation)psx_compile.read.1.tlog"
+      Lines="^%(psx_compile_tlog.Inputs);$(MSBuildProjectFullPath);%(psx_compile_tlog.Fullpath)" />
+    <psx_compile
+      Condition="'@(psx_compile)' != '' and '%(psx_compile.ExcludedFromBuild)' != 'true'"
+      CommandLineTemplate="%(psx_compile.CommandLineTemplate)"
+      AdditionalOptions="%(psx_compile.AdditionalOptions)"
+      Inputs="%(psx_compile.Identity)"
+      StandardOutputImportance="High"
+      StandardErrorImportance="High" />
+  </Target>
+  <Target
+    Name="Computepsx_compileOutput"
+    Condition="'@(psx_compile)' != ''">
+    <ItemGroup>
+      <psx_compileOutputs
+        Condition="'@(psx_compile)' != '' and '%(psx_compile.ExcludedFromBuild)' != 'true'"
+        Include="%(psx_compile.Outputs)" />
+      <Link
+        Include="%(psx_compileOutputs.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+      <Lib
+        Include="%(psx_compileOutputs.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+      <ImpLib
+        Include="%(psx_compileOutputs.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+    </ItemGroup>
+    <MakeDir Directories="@(psx_compileOutputs->'%(RootDir)%(Directory)')" />
+  </Target>
+</Project>

@@ -12,7 +12,7 @@
 			"description":   "Use this preset to build the project using PSn00bSDK.",
 			"generator":     "Ninja",
 			"toolchainFile": "$env{PSN00BSDK_LIBS}/cmake/sdk.cmake",
-			"binaryDir":     "${sourceDir}/../build",
+			"binaryDir":     "${sourceDir}/../cmakebuild",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug",
 				"PSN00BSDK_TC":     "",
